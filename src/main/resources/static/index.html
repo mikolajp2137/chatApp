@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login and Registration</title>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+</head>
+<body class="bg-light">
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <ul class="nav nav-tabs card-header-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="login-tab" data-toggle="tab" href="#login-form">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="registration-tab" data-toggle="tab" href="#registration-form">Registration</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-body tab-content">
+                    <!-- Login Form -->
+                    <div class="tab-pane fade show active" id="login-form">
+                        <h2 class="card-title">Login</h2>
+                        <form id="loginForm">
+                            <div class="form-group">
+                                <label for="loginEmail">Email:</label>
+                                <input type="email" id="loginEmail" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="loginPassword">Password:</label>
+                                <input type="password" id="loginPassword" class="form-control" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Login</button>
+                        </form>
+                    </div>
+
+                    <!-- Registration Form -->
+                    <div class="tab-pane fade" id="registration-form">
+                        <h2 class="card-title">Registration</h2>
+                        <form id="registrationForm">
+                            <div class="form-group">
+                                <label for="firstname">First Name:</label>
+                                <input type="text" id="firstname" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="lastname">Last Name:</label>
+                                <input type="text" id="lastname" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email:</label>
+                                <input type="email" id="email" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="password">Password:</label>
+                                <input type="password" id="password" class="form-control" required>
+                            </div>
+                            <button type="submit" class="btn btn-success">Register</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS and dependencies -->
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
+<script>
+    document.getElementById('loginForm').addEventListener('submit', login);
+    document.getElementById('registrationForm').addEventListener('submit', register);
+
+    async function login(event) {
+        event.preventDefault();
+
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
+
+        const response = await fetch('http://localhost:8080/api/v1/auth/authenticate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                email,
+                password,
+            }),
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            const token = data.token;
+            sessionStorage.setItem('token', token);
+            window.location.href = 'chat.html';
+        } else {
+            alert('Login failed. Please check your credentials and try again.');
+        }
+    }
+
+    async function register(event) {
+        event.preventDefault();
+
+        const firstname = document.getElementById('firstname').value;
+        const lastname = document.getElementById('lastname').value;
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+
+        const response = await fetch('http://localhost:8080/api/v1/auth/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                firstname,
+                lastname,
+                email,
+                password,
+            }),
+        });
+
+        if (response.ok) {
+            alert('Registration successful!');
+        } else {
+            alert('Registration failed. Please try again.');
+        }
+    }
+</script>
+
+</body>
+</html>

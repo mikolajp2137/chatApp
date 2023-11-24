@@ -15,7 +15,9 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Integer id;
+    @Column(name = "first_name")
     private String firstName;
+    @Column(name = "last_name")
     private String lastName;
     private String email;
     private String password;
@@ -24,12 +26,13 @@ public class User implements UserDetails {
 
     public User(){}
 
-    public User(Integer id, String firstName, String lastName, String email, String password) {
+    public User(Integer id, String firstName, String lastName, String email, String password, Role role) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.password = password;
+        this.role = role;
     }
 
     public static class Builder{
@@ -38,6 +41,7 @@ public class User implements UserDetails {
         private String lastName;
         private String email;
         private String password;
+        private Role role;
 
         public static Builder create(){return new Builder();}
         public Builder withId(Integer id){
@@ -46,6 +50,10 @@ public class User implements UserDetails {
         }
         public Builder withFirstName(String firstName){
             this.firstName = firstName;
+            return this;
+        }
+        public Builder withRole(Role role){
+            this.role = role;
             return this;
         }
         public Builder withLastName(String lastName){
@@ -61,8 +69,16 @@ public class User implements UserDetails {
             return this;
         }
         public User build(){
-            return new User(id, firstName, lastName, email, password);
+            return new User(id, firstName, lastName, email, password, role);
         }
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
     }
 
     public Integer getId() {
@@ -136,6 +152,19 @@ public class User implements UserDetails {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return Objects.equals(id, user.id) && Objects.equals(firstName, user.firstName) && Objects.equals(lastName, user.lastName) && Objects.equals(email, user.email) && Objects.equals(password, user.password) && role == user.role;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, firstName, lastName, email, password, role);
+    }
+
+    @Override
     public String toString() {
         return "User{" +
                 "id=" + id +
@@ -143,19 +172,7 @@ public class User implements UserDetails {
                 ", lastName='" + lastName + '\'' +
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
+                ", role=" + role +
                 '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        User user = (User) o;
-        return Objects.equals(id, user.id) && Objects.equals(firstName, user.firstName) && Objects.equals(lastName, user.lastName) && Objects.equals(email, user.email) && Objects.equals(password, user.password);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, firstName, lastName, email, password);
     }
 }
