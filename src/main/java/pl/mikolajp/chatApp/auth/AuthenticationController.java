@@ -14,6 +14,7 @@ public class AuthenticationController {
         this.service = service;
     }
 
+    //test
     @CrossOrigin
     @PostMapping("/register")
     public ResponseEntity<AuthenticationResponse> register(
