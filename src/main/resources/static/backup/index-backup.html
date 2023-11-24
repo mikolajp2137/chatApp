@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration and Authentication</title>
+</head>
+<body>
+
+<div id="registration-form">
+    <h2>Registration</h2>
+    <form onsubmit="register(event)">
+        <label for="firstname">First Name:</label>
+        <input type="text" id="firstname" required><br>
+
+        <label for="lastname">Last Name:</label>
+        <input type="text" id="lastname" required><br>
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" required><br>
+
+        <label for="password">Password:</label>
+        <input type="password" id="password" required><br>
+
+        <button type="submit">Register</button>
+    </form>
+</div>
+
+<div id="login-form">
+    <h2>Login</h2>
+    <form onsubmit="login(event)">
+        <label for="loginEmail">Email:</label>
+        <input type="email" id="loginEmail" required><br>
+
+        <label for="loginPassword">Password:</label>
+        <input type="password" id="loginPassword" required><br>
+
+        <button type="submit">Login</button>
+    </form>
+</div>
+
+<script>
+    async function register(event) {
+        event.preventDefault();
+
+        const firstname = document.getElementById('firstname').value;
+        const lastname = document.getElementById('lastname').value;
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+
+        const response = await fetch('http://localhost:8080/api/v1/auth/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                firstname,
+                lastname,
+                email,
+                password,
+            }),
+        });
+
+        if (response.ok) {
+            alert('Registration successful!');
+        } else {
+            alert('Registration failed. Please try again.');
+        }
+    }
+
+    // ... (your existing code) ...
+
+    async function login(event) {
+        event.preventDefault();
+
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
+
+        const response = await fetch('http://localhost:8080/api/v1/auth/authenticate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                email,
+                password,
+            }),
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            const token = data.token;
+
+            // Store the token in sessionStorage
+            sessionStorage.setItem('token', token);
+
+            // Set the token as a SameSite=None cookie for local testing without HTTPS
+            document.cookie = `token=${token}; SameSite=None`;
+
+            // Add the token to the Authorization header for the redirect
+            const headers = new Headers();
+            headers.append('Authorization', `Bearer ${token}`);
+
+            // Redirect to the success page with the Authorization header
+            window.location.href = 'success.html';
+        } else {
+            alert('Login failed. Please check your credentials and try again.');
+        }
+    }
+
+    // ... (your existing code) ...
+
+</script>
+
+</body>
+</html>
